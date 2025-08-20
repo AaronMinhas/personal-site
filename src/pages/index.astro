@@ -1,15 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Terminal from '../components/Terminal/Terminal.tsx';
 ---
 
-<Layout title="Personal Site">
-	<main class="p-8">
-		<h1 class="text-5xl font-bold text-cyan-400">Webby Site</h1>
-		<p class="mt-4 text-neutral-400">
-			Yummy = Astro, React, TypeScript, and Tailwind CSS.
-		</p>
-		<p class="text-neutral-400">
-			Time to learn this.
-		</p>
-	</main>
+<Layout title="Aaron">
+    <Terminal client:load>
+        <div class="p-8">
+            <h1 class="text-2xl font-medium text-vesper-accent">Vesper theme!</h1>
+            <p class="mt-2 text-vesper-secondary">So good...</p>
+        </div>
+    </Terminal>
 </Layout>
