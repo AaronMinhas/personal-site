@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# old vanilla portfolio files: index.html, script.js and styles.css
+old/
