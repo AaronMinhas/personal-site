@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import TerminalHeader from './TerminalHeader';
 import AboutSection from '../Content/AboutSection';
 
@@ -16,38 +16,11 @@ const tabs = [
 
 export default function Terminal({ children, className }: TerminalProps) {
   const [activeTab, setActiveTab] = useState('about');
-  const [terminalHeight, setTerminalHeight] = useState<number | null>(null);
-  const aboutSectionRef = useRef<HTMLDivElement>(null);
-
-  // Calculate height when AboutSection mounts
-  useEffect(() => {
-    if (activeTab === 'about' && aboutSectionRef.current) {
-      const height = aboutSectionRef.current.scrollHeight;
-      setTerminalHeight(height);
-    }
-  }, [activeTab]);
-
-  // Calculate on window resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (activeTab === 'about' && aboutSectionRef.current) {
-        const height = aboutSectionRef.current.scrollHeight;
-        setTerminalHeight(height);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [activeTab]);
 
   const renderContent = () => {
     switch (activeTab) {
       case 'about':
-        return (
-          <div ref={aboutSectionRef}>
-            <AboutSection />
-          </div>
-        );
+        return <AboutSection />;
       case 'projects':
         return (
           <div className="p-4 h-full flex items-center justify-center">
@@ -76,42 +49,23 @@ export default function Terminal({ children, className }: TerminalProps) {
           </div>
         );
       default:
-        return (
-          <div ref={aboutSectionRef}>
-            <AboutSection />
-          </div>
-        );
+        return <AboutSection />;
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen p-5" style={{ backgroundColor: '#0a0a0a' }}>
-      <div className="w-full max-w-[1100px]">
+      <div className="w-full max-w-6xl bg-vesper-terminal border border-vesper-border rounded-lg shadow-2xl overflow-hidden">
+        <TerminalHeader tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+        
         <div 
-          className="rounded-md overflow-hidden border"
+          className="bg-vesper-terminal text-white font-mono text-sm overflow-auto"
           style={{ 
-            backgroundColor: '#101010',
-            borderColor: '#282828',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)'
+            height: '600px',
+            contain: 'strict'
           }}
         >
-          <TerminalHeader 
-            tabs={tabs}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-          />
-          <div 
-            className={`font-mono text-white ${className || ''}`}
-            style={{ 
-              fontFamily: "'JetBrains Mono', monospace",
-              height: terminalHeight ? `${terminalHeight}px` : 'auto',
-              overflow: 'hidden'
-            }}
-          >
-            <div className="h-full overflow-y-auto">
-              {renderContent()}
-            </div>
-          </div>
+          {renderContent()}
         </div>
       </div>
     </div>
