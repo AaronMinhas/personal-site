@@ -12,10 +12,9 @@ export default function AboutSection() {
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
 
-  // Cursor blinking effect
   useEffect(() => {
     const interval = setInterval(() => {
-      setCursorVisible(prev => !prev);
+      setCursorVisible((prev) => !prev);
     }, 500);
     return () => clearInterval(interval);
   }, []);
@@ -171,6 +170,11 @@ export default function AboutSection() {
             
     setCommands(prev => [...prev, { command, output }]);
   };
+
+  // Execute fastfetch on component mount
+  useEffect(() => {
+    executeCommand('fastfetch');
+  }, []);
 
   // Auto-focus on mount
   useEffect(() => {

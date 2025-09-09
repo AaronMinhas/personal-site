@@ -17,41 +17,7 @@ const tabs = [
 export default function Terminal({ children, className }: TerminalProps) {
   const [activeTab, setActiveTab] = useState('about');
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'about':
-        return <AboutSection />;
-      case 'projects':
-        return (
-          <div className="p-4 h-full flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-vesper-accent text-lg mb-2">Projects</div>
-              <div className="text-vesper-secondary">Content coming soon...</div>
-            </div>
-          </div>
-        );
-      case 'contact':
-        return (
-          <div className="p-4 h-full flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-vesper-accent text-lg mb-2">Contact</div>
-              <div className="text-vesper-secondary">Content coming soon...</div>
-            </div>
-          </div>
-        );
-      case 'blog':
-        return (
-          <div className="p-4 h-full flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-vesper-accent text-lg mb-2">Blog</div>
-              <div className="text-vesper-secondary">Content coming soon...</div>
-            </div>
-          </div>
-        );
-      default:
-        return <AboutSection />;
-    }
-  };
+  // Keep all tab panels mounted so their internal state persists
 
   return (
     <div className="flex items-center justify-center min-h-screen p-5" style={{ backgroundColor: '#0a0a0a' }}>
@@ -65,7 +31,40 @@ export default function Terminal({ children, className }: TerminalProps) {
             contain: 'strict'
           }}
         >
-          {renderContent()}
+          {/* About tab */}
+          <div role="tabpanel" aria-labelledby="tab-about" className={activeTab === 'about' ? 'h-full' : 'h-full hidden'}>
+            <AboutSection />
+          </div>
+
+          {/* Projects tab placeholder */}
+          <div role="tabpanel" aria-labelledby="tab-projects" className={activeTab === 'projects' ? 'h-full' : 'h-full hidden'}>
+            <div className="p-4 h-full flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-vesper-accent text-lg mb-2">Projects</div>
+                <div className="text-vesper-secondary">Content coming soon...</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact tab placeholder */}
+          <div role="tabpanel" aria-labelledby="tab-contact" className={activeTab === 'contact' ? 'h-full' : 'h-full hidden'}>
+            <div className="p-4 h-full flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-vesper-accent text-lg mb-2">Contact</div>
+                <div className="text-vesper-secondary">Content coming soon...</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Blog tab placeholder */}
+          <div role="tabpanel" aria-labelledby="tab-blog" className={activeTab === 'blog' ? 'h-full' : 'h-full hidden'}>
+            <div className="p-4 h-full flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-vesper-accent text-lg mb-2">Blog</div>
+                <div className="text-vesper-secondary">Content coming soon...</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
