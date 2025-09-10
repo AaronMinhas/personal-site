@@ -196,18 +196,18 @@ export default function AboutSection() {
       style={{ contain: 'layout style paint' }}
     >
       {/* Terminal Login */}
-      <div className="text-vesper-secondary text-sm mb-2">
+      <div className="text-vesper-secondary text-sm mb-1">
         Last login: Mon 27 Sep 21:30:28 on ttys001
       </div>
 
       {/* Previous Commands */}
       {commands.map((cmd, index) => (
-        <div key={index} className="mb-4">
+        <div key={index} className="mb-1">
           <div className="flex items-center">
             <span className="text-vesper-accent mr-2 font-medium">aaron@portfolio ~ %</span>
             <span className="text-white">{cmd.command}</span>
           </div>
-          {cmd.output && <div className="mt-2">{cmd.output}</div>}
+          {cmd.output && <div className="mt-1">{cmd.output}</div>}
         </div>
       ))}
 
