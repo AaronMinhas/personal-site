@@ -20,14 +20,13 @@ export default function Terminal({ children, className }: TerminalProps) {
   // Keep all tab panels mounted so their internal state persists
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-5" style={{ backgroundColor: '#0a0a0a' }}>
+    <div className="flex items-center justify-center min-h-screen p-3 sm:p-4 md:p-5" style={{ backgroundColor: '#0a0a0a' }}>
       <div className="w-full max-w-6xl bg-vesper-terminal border border-vesper-border rounded-lg shadow-2xl overflow-hidden">
         <TerminalHeader tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
         
         <div 
-          className="bg-vesper-terminal text-white font-mono text-sm overflow-auto"
+          className="bg-vesper-terminal text-white font-mono text-xs sm:text-sm overflow-auto overscroll-contain h-[70vh] md:h-[600px]"
           style={{ 
-            height: '600px',
             contain: 'strict'
           }}
         >

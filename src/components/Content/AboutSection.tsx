@@ -46,8 +46,8 @@ export default function AboutSection() {
     switch (trimmedCommand) {
       case 'fastfetch':
         output = (
-          <div className="flex gap-6 mb-4">
-            <div className="flex-shrink-0 text-xs leading-tight font-mono whitespace-pre">
+          <div className="flex flex-col md:flex-row gap-3 md:gap-6 mb-3">
+            <div className="flex-shrink-0 font-mono whitespace-pre leading-tight text-[10px] sm:text-[11px] md:text-[12px]">
             <div style={{ color: '#e6edf3' }}>                     ..'</div>
               <div style={{ color: '#ff6b6b' }}>                 ,xNMM.</div>
               <div style={{ color: '#51cf66' }}>               .OMMMMo</div>
@@ -68,69 +68,69 @@ export default function AboutSection() {
             </div>
 
             {/* System Info */}
-            <div className="flex-1 text-sm leading-relaxed">
+            <div className="flex-1 text-xs sm:text-sm leading-tight sm:leading-relaxed">
               <div className="text-white font-semibold">aaron@portfolio</div>
               <div className="text-vesper-secondary mb-1">-----------------</div>
               
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Role:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Role:</span>
                 <span className="text-white">Software Engineering & Business Student</span>
               </div>
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Location:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Location:</span>
                 <span className="text-white">Sydney, Australia</span>
               </div>
               
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Focus:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Focus:</span>
                 <span className="text-white">DevOps Engineering & Cloud Infrastructure</span>
               </div>
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Learning:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Learning:</span>
                 <span className="text-white">CI/CD, Infrastructure as Code, Containerisation</span>
               </div>
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Education:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Education:</span>
                 <span className="text-white">Macquarie University – Software Engineering & Business</span>
               </div>
               
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Languages:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Languages:</span>
                 <span className="text-white">Python, Bash, Java, JS, YAML</span>
               </div>
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Tools:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Tools:</span>
                 <span className="text-white">Docker, Jenkins, Ansible, Prometheus, Grafana</span>
               </div>
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Infra:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Infra:</span>
                 <span className="text-white">ESXi, Nginx, Docker Swarm</span>
               </div>
               
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Homelab:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Homelab:</span>
                 <span className="text-white">Home Assistant, ESPHome, various self-hosted applications</span>
               </div>
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Interests:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Interests:</span>
                 <span className="text-white">IoT automation, Self-hosting, IaC</span>
               </div>
 
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Terminal:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Terminal:</span>
                 <span className="text-white">Ghostty with zsh</span>
               </div>
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Editor:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Editor:</span>
                 <span className="text-white">VS Code with JetBrains Mono</span>
               </div>
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Theme:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Theme:</span>
                 <span className="text-white">Vesper (Dark) – because dark mode is life</span>
               </div>
                 
               <div className="mb-0.5">
-                <span className="text-vesper-accent font-medium inline-block min-w-[120px]">Portfolio:</span>
+                <span className="text-vesper-accent font-medium inline-block min-w-[88px] sm:min-w-[110px] md:min-w-[120px]">Portfolio:</span>
                 <span className="text-white">Built with love using Astro, React & Tailwind</span>
               </div>
             </div>
