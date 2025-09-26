@@ -1,0 +1,19 @@
+---
+interface Props {
+  currentPage?: string;
+}
+
+const { currentPage = '' } = Astro.props;
+---
+
+<div class="w-full max-w-6xl mb-8 relative z-10 flex justify-center pt-6 mx-auto">
+  <div class="w-full sm:w-3/4 md:w-1/2 bg-black/50 px-2 sm:px-4 py-2 rounded-lg backdrop-blur-sm flex items-center justify-center gap-2 sm:gap-4 md:gap-6">
+    <a href="/" class={`text-sm font-mono transition-colors ${currentPage === 'home' ? 'text-vesper-accent' : 'text-white hover:text-vesper-accent'}`}>home</a>
+    <a href="/about" class={`text-sm font-mono transition-colors ${currentPage === 'about' ? 'text-vesper-accent' : 'text-white hover:text-vesper-accent'}`}>about</a>
+    <a href="/projects" class={`text-sm font-mono transition-colors ${currentPage === 'projects' ? 'text-vesper-accent' : 'text-white hover:text-vesper-accent'}`}>projects</a>
+    <a href="/takes" class={`text-sm font-mono transition-colors ${currentPage === 'takes' ? 'text-vesper-accent' : 'text-white hover:text-vesper-accent'}`}>takes</a>
+    <a href="/thoughts" class={`text-sm font-mono transition-colors ${currentPage === 'thoughts' ? 'text-vesper-accent' : 'text-white hover:text-vesper-accent'}`}>thoughts</a>
+    <a href="/setup" class={`text-sm font-mono transition-colors ${currentPage === 'setup' ? 'text-vesper-accent' : 'text-white hover:text-vesper-accent'}`}>setup</a>
+    <a href="/contact" class={`text-sm font-mono transition-colors ${currentPage === 'contact' ? 'text-vesper-accent' : 'text-white hover:text-vesper-accent'}`}>contact</a>
+  </div>
+</div>

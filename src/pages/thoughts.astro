@@ -1,22 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
 ---
 
 <Layout title="Thoughts - Aaron">
   <div class="min-h-screen bg-vesper-terminal">
-    
-    {/* Navigation Bar */}
-    <div class="w-full max-w-6xl mb-8 relative z-10 flex justify-center pt-6 mx-auto">
-      <div class="w-full sm:w-3/4 md:w-1/2 bg-black/50 px-2 sm:px-4 py-2 rounded-lg backdrop-blur-sm flex items-center justify-center gap-2 sm:gap-4 md:gap-6">
-        <a href="/" class="text-vesper-secondary text-sm font-mono hover:text-vesper-accent transition-colors">home</a>
-        <a href="/about" class="text-vesper-secondary text-sm font-mono hover:text-vesper-accent transition-colors">about</a>
-        <a href="/projects" class="text-vesper-secondary text-sm font-mono hover:text-vesper-accent transition-colors">projects</a>
-        <a href="/takes" class="text-vesper-secondary text-sm font-mono hover:text-vesper-accent transition-colors">takes</a>
-        <a href="/thoughts" class="text-white text-sm font-mono hover:text-vesper-accent transition-colors">thoughts</a>
-        <a href="/setup" class="text-vesper-secondary text-sm font-mono hover:text-vesper-accent transition-colors">setup</a>
-        <a href="/contact" class="text-vesper-secondary text-sm font-mono hover:text-vesper-accent transition-colors">contact</a>
-      </div>
-    </div>
+    <Navigation currentPage="thoughts" />
 
     {/* Main Content */}
     <div class="w-full max-w-4xl mx-auto px-6 sm:px-8">
