@@ -11,9 +11,8 @@ interface Command {
 }
 
 export default function Terminal({ children, className }: TerminalProps) {
-  // Terminal transparency settings - easily editable
-  const TERMINAL_OPACITY = 'bg-black/60'; // Change this value: /20 = very transparent, /60 = less transparent
-  const BACKDROP_BLUR = 'backdrop-blur-sm'; // Change this: backdrop-blur-none, backdrop-blur-sm, backdrop-blur-md
+  const TERMINAL_OPACITY = 'bg-black/60'; 
+  const BACKDROP_BLUR = 'backdrop-blur-sm'; // backdrop-blur-none, backdrop-blur-sm, backdrop-blur-md
   
   const [commands, setCommands] = useState<Command[]>([]);
   const [currentInput, setCurrentInput] = useState('');
@@ -111,18 +110,41 @@ export default function Terminal({ children, className }: TerminalProps) {
       {/* Background overlay for better text readability */}
       <div className="absolute inset-0 bg-black/20"></div>
       
+      {/* Navigation Bar*/}
+      <div className="w-full max-w-6xl mb-6 relative z-10 flex justify-center">
+        <div className="w-full sm:w-3/4 md:w-1/2 bg-black/50 px-2 sm:px-4 py-2 rounded-lg backdrop-blur-sm flex items-center justify-center gap-2 sm:gap-4 md:gap-6">
+          <a href="/about" className="text-white text-sm font-mono hover:text-vesper-accent transition-colors">
+            about
+          </a>
+          <a href="/projects" className="text-white text-sm font-mono hover:text-vesper-accent transition-colors">
+            projects
+          </a>
+          <a href="/takes" className="text-white text-sm font-mono hover:text-vesper-accent transition-colors">
+            takes
+          </a>
+          <a href="/thoughts" className="text-white text-sm font-mono hover:text-vesper-accent transition-colors">
+            thoughts
+          </a>
+          <a href="/setup" className="text-white text-sm font-mono hover:text-vesper-accent transition-colors">
+            setup
+          </a>
+          <a href="/contact" className="text-white text-sm font-mono hover:text-vesper-accent transition-colors">
+            contact
+          </a>
+        </div>
+      </div>
+      
       <div className={`w-full max-w-6xl ${TERMINAL_OPACITY} ${BACKDROP_BLUR} border border-vesper-border rounded-lg shadow-2xl overflow-hidden relative z-10`}>
-        {/* Simple terminal header */}
-        <div className="flex items-center justify-between px-2 sm:px-4 py-2" style={{ backgroundColor: '#161616', borderBottom: '1px solid #282828' }}>
+        <div className="relative flex items-center px-2 sm:px-4 py-2" style={{ backgroundColor: '#161616', borderBottom: '1px solid #282828' }}>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-red-500"></div>
             <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
-          <div className="ml-4 text-vesper-secondary text-sm font-mono">
+          <div className="absolute left-1/2 transform -translate-x-1/2 text-vesper-secondary text-sm font-mono">
             aaron@mind
           </div>
-          <div className="text-vesper-secondary text-sm font-mono">
+          <div className="ml-auto text-vesper-secondary text-sm font-mono hidden sm:block">
             Mon 27 Sep 21:30:28 ❤️
           </div>
         </div>
