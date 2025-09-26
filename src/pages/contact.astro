@@ -1,18 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
-
-// Get current date and time
-const now = new Date();
-const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-const dayName = dayNames[now.getDay()];
-const month = monthNames[now.getMonth()];
-const day = now.getDate();
-const hours = now.getHours();
-const minutes = now.getMinutes().toString().padStart(2, '0');
-const timeString = `It is currently ${dayName}, ${month} ${day} at ${hours}:${minutes} for me.`;
 ---
 
 <Layout title="Contact - Aaron">
@@ -28,7 +16,7 @@ const timeString = `It is currently ${dayName}, ${month} ${day} at ${hours}:${mi
       <div class="max-w-2xl mx-auto">
         <h1 class="text-white text-4xl sm:text-5xl font-mono font-light mb-6" style="font-family: 'JetBrains Mono', monospace;">Contact me</h1>
         
-        <p class="text-gray-300 text-lg font-mono mb-8" style="font-family: 'JetBrains Mono', monospace;">{timeString}</p>
+        <p id="timeString" class="text-gray-300 text-lg font-mono mb-8" style="font-family: 'JetBrains Mono', monospace;">Loading...</p>
         
         <div class="space-y-4">
           <div class="flex items-center space-x-4">
@@ -66,4 +54,30 @@ const timeString = `It is currently ${dayName}, ${month} ${day} at ${hours}:${mi
       </div>
     </div>
   </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+      const dayName = dayNames[now.getDay()];
+      const month = monthNames[now.getMonth()];
+      const day = now.getDate();
+      const hours = now.getHours();
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const timeString = `It is currently ${dayName}, ${month} ${day} at ${hours}:${minutes} for me.`;
+
+      const timeElement = document.getElementById('timeString');
+      if (timeElement) {
+        timeElement.textContent = timeString;
+      }
+    }
+
+    // Update time immediately
+    updateTime();
+    
+    // Update time every minute
+    setInterval(updateTime, 60000);
+  </script>
 </Layout>
