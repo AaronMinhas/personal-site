@@ -48,3 +48,83 @@
   animation: cursor-blink 1s infinite !important;
   will-change: opacity;
 }
+
+/* Smooth typing animation */
+.typing-container {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline; /* keep baseline with prompt */
+  vertical-align: baseline;
+}
+
+.typing-text {
+  position: relative;
+  display: inline-block;
+  /* Inherit exact metrics from the terminal line to avoid layout shift */
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  overflow: hidden;
+  white-space: nowrap;
+  /* Caret drawn with ::after so it doesn't affect layout height/width */
+  box-sizing: content-box;
+  width: 0;
+  vertical-align: baseline; /* match surrounding text */
+  animation: 
+    typing calc(var(--char-count) * 0.1s + 0.8s) steps(var(--char-count), end) forwards,
+    blink-caret 0.75s step-end infinite;
+  animation-delay: 1.2s;
+}
+
+/* Draw caret without influencing layout to avoid any vertical shift */
+.typing-text::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%); /* center caret precisely */
+  height: 1em; /* match text height regardless of line-height quirks */
+  width: 1px;
+  background: #ffffff;
+  animation: blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink-caret {
+  from, to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: #ffffff;
+  }
+}
+
+/* Remove the caret after typing is complete */
+.typing-text.typing-complete {
+  animation: none;
+  width: 100%;
+}
+
+.typing-text.typing-complete::after {
+  opacity: 0;
+  animation: none;
+}
+
+/* Smooth Spotify progress bar animation */
+.spotify-progress-bar {
+  width: 0%;
+  transition: width 0.2s ease-out;
+  will-change: width;
+}
+
+.spotify-progress-bar.smooth-playing {
+  transition: width 1s linear;
+}
