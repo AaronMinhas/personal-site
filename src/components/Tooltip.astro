@@ -1,0 +1,147 @@
+---
+import { terms } from "../data/terms";
+
+interface Props {
+  term: string;
+  label?: string;
+}
+
+const { term, label } = Astro.props;
+const definition = terms[term];
+const displayLabel = label || term;
+---
+
+<span class="tooltip-container">
+  <span class="trigger">{displayLabel}</span>
+  {
+    definition && (
+      <span class="tooltip-card">
+        {(definition.title || term) && (
+          <span class="title">{definition.title || term}</span>
+        )}
+        {definition.image && (
+          <img src={definition.image} alt={term} class="image" />
+        )}
+        <span class="description">{definition.description}</span>
+      </span>
+    )
+  }
+</span>
+
+<style>
+  .tooltip-container {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    border-bottom: 1px dotted var(--text-muted);
+  }
+
+  .trigger {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .tooltip-card {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    left: 50%;
+    width: 250px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease,
+      visibility 0.2s;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+    /* Default: above */
+    bottom: 100%;
+    transform: translateX(-50%) translateY(10px);
+  }
+
+  .tooltip-container:hover .tooltip-card {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(-10px);
+  }
+
+  /* Flipped: below */
+  .tooltip-container[data-position="bottom"] .tooltip-card {
+    bottom: auto;
+    top: 100%;
+    transform: translateX(-50%) translateY(-10px);
+  }
+
+  .tooltip-container[data-position="bottom"]:hover .tooltip-card {
+    transform: translateX(-50%) translateY(10px);
+  }
+
+  .title {
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .image {
+    width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+    border-radius: 4px;
+    margin-bottom: 0.25rem;
+  }
+
+  .description {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+  }
+
+  /* Triangle Arrow - Above */
+  .tooltip-card::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: var(--border) transparent transparent transparent;
+  }
+
+  /* Triangle Arrow - Below (flipped) */
+  .tooltip-container[data-position="bottom"] .tooltip-card::after {
+    top: auto;
+    bottom: 100%;
+    border-color: transparent transparent var(--border) transparent;
+  }
+</style>
+
+<script>
+  document.querySelectorAll(".tooltip-container").forEach((container) => {
+    container.addEventListener("mouseenter", () => {
+      const rect = container.getBoundingClientRect();
+      const spaceAbove = rect.top;
+      const tooltipHeight = 300;
+
+      // Only flip if tooltip would overflow the viewport top
+      if (spaceAbove < tooltipHeight) {
+        container.setAttribute("data-position", "bottom");
+      } else {
+        container.removeAttribute("data-position");
+      }
+    });
+  });
+</script>

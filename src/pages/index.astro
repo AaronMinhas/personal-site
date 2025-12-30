@@ -1,13 +1,146 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Terminal from '../components/Terminal/Terminal.tsx';
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("posts", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
+
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  }).format(date);
 ---
 
-<Layout title="Aaron">
-    <Terminal client:load>
-        <div class="p-8">
-            <h1 class="text-2xl font-medium text-vesper-accent">Vesper theme!</h1>
-            <p class="mt-2 text-vesper-secondary">So good...</p>
-        </div>
-    </Terminal>
+<Layout title="aaronminhas">
+  <main>
+    <h2>about me</h2>
+    <ul>
+      <li>final-year software engineering student</li>
+      <li>focused on learning devops</li>
+      <li>self-hoster / homelab enjoyer</li>
+    </ul>
+
+    <p>
+      This site serves as my public notebook, where I share some of my thoughts,
+      learnings, and any cool projects I work on.
+    </p>
+    <p>
+      If you’re new here, start with the latest posts below, browse <a
+        href="/projects">projects</a
+      >, or
+      <a href="/contact">reach out</a>.
+    </p>
+
+    <h2>writing</h2>
+    {
+      posts.length > 0 ? (
+        <ul class="writing">
+          {posts.map((post) => (
+            <li>
+              <a href={`/blog/${post.slug}`} class="post-entry">
+                <span class="date">{formatDate(post.data.date)}</span>
+                <span class="title">{post.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="empty">nothing here yet.</p>
+      )
+    }
+  </main>
 </Layout>
+
+<style>
+  main {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 0 1.5rem 2rem;
+  }
+
+  h2 {
+    font-weight: bold;
+    margin: 1.2em 0 0.3em;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  h2:first-child {
+    margin-top: 0;
+  }
+
+  ul {
+    list-style: square;
+    margin: 0 0 0.5em;
+    padding-left: 1.1em;
+  }
+
+  li {
+    margin: 0;
+    padding-left: 0.3em;
+  }
+
+  p {
+    margin: 0.5em 0;
+  }
+
+  a {
+    color: var(--text);
+    text-decoration: underline;
+  }
+
+  a:hover {
+    color: var(--link);
+  }
+
+  .writing {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .writing li {
+    padding: 0;
+  }
+
+  .post-entry {
+    display: flex;
+    align-items: baseline;
+    padding: 0.35rem 0.5rem;
+    margin: 0 -0.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  .post-entry:hover {
+    background: rgba(128, 128, 128, 0.08);
+  }
+
+  .post-entry .date {
+    color: var(--text-faint);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    width: 5.5rem;
+    margin-right: 0.5rem;
+  }
+
+  .post-entry .title {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 2px;
+    transition: text-decoration-color 0.15s ease;
+  }
+
+  .post-entry:hover .title {
+    text-decoration-color: var(--text-faint);
+  }
+
+  .empty {
+    color: var(--text-muted);
+    margin: 0;
+  }
+</style>

@@ -1,20 +1,85 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Navigation from '../components/Navigation.astro';
+import Layout from "../layouts/Layout.astro";
+
+const projects = [
+  {
+    title: "This Website",
+    description: "Personal site built with Astro.",
+    url: "https://github.com/AaronMinhas/personal-site",
+  },
+];
 ---
 
-<Layout title="Projects - Aaron">
-  <div class="min-h-screen bg-vesper-terminal">
-    <Navigation currentPage="projects" />
-
-    {/* Main Content */}
-    <div class="w-full max-w-4xl mx-auto px-6 sm:px-8">
-      <div class="text-center">
-        <h1 class="text-vesper-accent text-3xl sm:text-4xl font-mono mb-8">Projects</h1>
-        <div class="text-vesper-secondary text-lg font-mono">
-          <p>Coming Soon</p>
-        </div>
-      </div>
-    </div>
-  </div>
+<Layout title="projects">
+  <main class="page">
+    <ul class="projects">
+      {
+        projects.map((project) => (
+          <li>
+            <a
+              href={project.url}
+              class="project-entry"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <p class="title">{project.title}</p>
+              <p class="desc">{project.description}</p>
+              <span class="view">View →</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
 </Layout>
+
+<style>
+  .page {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 0 1.5rem 2rem;
+  }
+
+  .projects {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .projects li {
+    margin-bottom: 0.5rem;
+  }
+
+  .project-entry {
+    display: block;
+    padding: 0.75rem;
+    margin: 0 -0.75rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  .project-entry:hover {
+    background: rgba(128, 128, 128, 0.1);
+  }
+
+  .title {
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.25rem;
+  }
+
+  .desc {
+    color: var(--text-muted);
+    margin: 0 0 0.5rem;
+  }
+
+  .view {
+    color: var(--text-faint);
+    font-size: 0.9rem;
+  }
+
+  .project-entry:hover .view {
+    color: var(--text);
+  }
+</style>
