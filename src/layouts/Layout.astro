@@ -21,14 +21,10 @@ const canonicalUrl =
 	Astro.site && pathname !== "/404"
 		? new URL(pathname, Astro.site).href
 		: undefined;
-// The portrait hover on the name only appears on the homepage.
-const isHome = pathname === "/";
 
 // Injected at build time by astro.config.mjs.
 declare const __BUILD_COMMIT__: string;
 const repoUrl = "https://github.com/AaronMinhas/personal-site";
-// Always the current GitHub profile picture, so it never needs updating here.
-const portraitUrl = "https://github.com/AaronMinhas.png?size=400";
 const firstYear = 2025;
 const currentYear = new Date().getFullYear();
 const years =
@@ -89,13 +85,7 @@ const hasPosts =
 	</head>
 	<body>
 		<header class="navbar">
-			<a
-				href="/"
-				class="name"
-				data-preview={isHome ? portraitUrl : undefined}
-				data-preview-alt={isHome ? "Aaron Minhas" : undefined}
-				data-preview-shape={isHome ? "square" : undefined}>Aaron</a
-			>
+			<a href="/" class="name">Aaron</a>
 			<nav>
 				{
 					hasPosts && (
@@ -188,7 +178,7 @@ const hasPosts =
 				card.appendChild(img);
 				document.body.appendChild(card);
 
-				const previewSelector = "[data-preview], [data-preview-logo]";
+				const previewSelector = "[data-preview]";
 				let current = null;
 				let hideTimer = null;
 
@@ -200,14 +190,6 @@ const hasPosts =
 					let y = e.clientY + pad;
 					if (x + cw + pad > innerWidth) x = e.clientX - cw - pad;
 					if (y + ch + pad > innerHeight) y = e.clientY - ch - pad;
-					// Logos sit beside the cursor, level with it, a little further out.
-					if (card.classList.contains("logo")) {
-						const gap = 40;
-						x = e.clientX + gap;
-						if (x + cw + pad > innerWidth) x = e.clientX - cw - gap;
-						y = e.clientY - ch / 2;
-						if (y + ch + pad > innerHeight) y = innerHeight - ch - pad;
-					}
 					if (x < pad) x = pad;
 					if (y < pad) y = pad;
 					card.style.left = x + "px";
@@ -215,14 +197,10 @@ const hasPosts =
 				}
 
 				function show(el, e) {
-					// A logo, when given, replaces the image on hover and floats
-					// with no card around it; the modal still shows the image.
-					const logo = el.getAttribute("data-preview-logo");
-					const src = logo || el.getAttribute("data-preview");
+					const src = el.getAttribute("data-preview");
 					if (!src) return;
 					clearTimeout(hideTimer);
 					current = el;
-					card.classList.toggle("logo", !!logo);
 					card.classList.toggle(
 						"square",
 						el.getAttribute("data-preview-shape") === "square",
@@ -262,8 +240,6 @@ const hasPosts =
 				// Adaptive border: white frame for dark images, black for light.
 				// Cross-origin images taint the canvas, so the read is defensive.
 				img.addEventListener("load", () => {
-					// Logos have no border to adapt.
-					if (card.classList.contains("logo")) return;
 					try {
 						const c = document.createElement("canvas");
 						c.width = 16;
@@ -781,22 +757,6 @@ const hasPosts =
 		height: 213px;
 		object-fit: cover;
 		background: var(--bg);
-	}
-
-	/* logo (data-preview-logo): just the icon, with no card behind it */
-	.preview-card.logo {
-		border: none;
-		border-radius: 0;
-		background: none;
-		box-shadow: none;
-		overflow: visible;
-	}
-
-	.preview-card.logo img {
-		width: 72px;
-		height: 72px;
-		object-fit: contain;
-		background: none;
 	}
 
 	/* square variant for portraits (data-preview-shape="square") */

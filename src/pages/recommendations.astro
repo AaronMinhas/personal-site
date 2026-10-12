@@ -35,10 +35,18 @@ export const prerender = true;
                                         caption={item.description}
                                         notes={item.notes}
                                         src={item.preview}
-                      logo={item.logo}
                                         alt={`${item.title} preview`}
                                     >
                                         {item.title}
+                                        {item.logo && (
+                                            <img
+                                                class="logo"
+                                                src={item.logo}
+                                                alt=""
+                                                width="16"
+                                                height="16"
+                                            />
+                                        )}
                                     </Preview>
                                 ) : (
                                     <a
@@ -47,6 +55,15 @@ export const prerender = true;
                                         rel="noopener noreferrer"
                                     >
                                         {item.title}
+                                        {item.logo && (
+                                            <img
+                                                class="logo"
+                                                src={item.logo}
+                                                alt=""
+                                                width="16"
+                                                height="16"
+                                            />
+                                        )}
                                     </a>
                                 )}
                                 <TagList tags={item.tags} />
@@ -131,6 +148,17 @@ export const prerender = true;
         align-items: baseline;
         justify-content: space-between;
         gap: 1rem;
+    }
+
+    /* Logo after the title, sized to the text so every recommendation's icon
+       matches, whatever the source file's dimensions. */
+    .logo {
+        display: inline-block;
+        width: 1.15em;
+        height: 1.15em;
+        margin-left: 0.45em;
+        object-fit: contain;
+        vertical-align: -0.2em;
     }
 
     /* Every title looks the same at rest, whether or not it has a hover preview.

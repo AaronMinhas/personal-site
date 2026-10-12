@@ -22,7 +22,7 @@ Follow the existing Astro and TypeScript style: two-space indentation in page/co
 
 ## Hover Previews & Tooltips
 
-Use `<Preview>` for image previews attached to words or links. Pass `src` and useful `alt` text; add `href` for a link or `modal` plus optional `title`/`caption` for an enlarged view. Pass both and the click opens the modal, whose image and title link out to `href`. Pass `notes` (an array of plain-text paragraphs) for a longer write-up under the caption. Leave `src` off for a text-only modal. Pass `logo` to show just that logo on hover, with no card around it, while the modal keeps `src`. Its shared positioning, fading, adaptive border, and modal logic lives in `Layout.astro` and is driven by `data-preview`/`data-modal` attributes. Do not duplicate that script in pages.
+Use `<Preview>` for image previews attached to words or links. Pass `src` and useful `alt` text; add `href` for a link or `modal` plus optional `title`/`caption` for an enlarged view. Pass both and the click opens the modal, whose image and title link out to `href`. Pass `notes` (an array of plain-text paragraphs) for a longer write-up under the caption. Leave `src` off for a text-only modal. Its shared positioning, fading, adaptive border, and modal logic lives in `Layout.astro` and is driven by `data-preview`/`data-modal` attributes. Do not duplicate that script in pages.
 
 Use `<Tooltip term="..." />` for definitions. Add or edit definitions in `src/data/terms.ts`.
 
@@ -32,7 +32,7 @@ Use `<SectionHeading>` for page titles and section labels. It renders the small 
 
 ## Recommendation Images
 
-Take recommendation screenshots with `npm run screenshot -- <url> <name>`, never by hand. It writes `public/images/software/<name>.webp` at a fixed window size, zoom, colour scheme, and output width so every modal image matches; change the constants in `scripts/screenshot.mjs` to restyle the whole set. Hover logos are the tool's official logo, unmodified, in `public/images/logos/`.
+Take recommendation screenshots with `npm run screenshot -- <url> <name>`, never by hand. It writes `public/images/software/<name>.webp` at a fixed window size, zoom, colour scheme, and output width so every modal image matches; change the constants in `scripts/screenshot.mjs` to restyle the whole set. Each recommendation's `logo` is the tool's official logo, unmodified, in `public/images/logos/`; it is shown after the title at the text's own size.
 
 ## Monthly Summaries
 

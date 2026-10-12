@@ -42,6 +42,9 @@ const upTo = [
 // bump this when the list above changes
 const upToUpdated = "2026-10-12";
 
+// Always the current GitHub profile picture, so it never needs updating here.
+const portraitUrl = "https://github.com/AaronMinhas.png?size=400";
+
 // Monthly summaries, newest first. The section hides itself while empty.
 const recentMonths = [...months]
     .sort((a, b) => b.month.localeCompare(a.month))
@@ -65,7 +68,11 @@ const longMonth = (month: string) =>
         <section class="block">
             <SectionHeading as="h1">about me</SectionHeading>
             <p class="lede">
-                I’m Aaron, a final-year software engineering student who likes
+                I’m <Preview
+                    src={portraitUrl}
+                    alt="Aaron Minhas"
+                    shape="square">Aaron</Preview
+                >, a final-year software engineering student who likes
                 understanding how things work.
             </p>
             <p>
@@ -180,6 +187,22 @@ const longMonth = (month: string) =>
     /* opening line: same size as the body copy, set apart by colour alone */
     .lede {
         color: var(--text);
+    }
+
+    /* The name in the intro shows a portrait on hover. A soft highlight behind
+       it hints that it reacts, and deepens when the pointer is over it. */
+    .lede :global(.preview-trigger) {
+        padding: 0.05em 0.2em;
+        margin: 0 -0.12em;
+        border-radius: 4px;
+        background: color-mix(in srgb, var(--link) 16%, transparent);
+        text-decoration: none;
+        cursor: default;
+        transition: background 0.15s ease;
+    }
+
+    .lede :global(.preview-trigger:hover) {
+        background: color-mix(in srgb, var(--link) 32%, transparent);
     }
 
     .facts {

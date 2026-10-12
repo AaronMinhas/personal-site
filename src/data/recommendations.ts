@@ -3,7 +3,7 @@ export interface Recommendation {
   description: string;
   url: string;
   preview?: string;
-  /** Official logo shown by itself on hover, e.g. "/images/logos/obsidian.svg". */
+  /** Official logo shown after the title, e.g. "/images/logos/obsidian.svg". */
   logo?: string;
   /** Longer write-up shown in the preview modal, one string per paragraph. Needs `preview`. */
   notes?: string[];
