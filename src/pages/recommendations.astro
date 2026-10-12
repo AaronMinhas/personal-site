@@ -1,0 +1,167 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageContainer from "../components/PageContainer.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import Preview from "../components/Preview.astro";
+import TagList from "../components/TagList.astro";
+import { recommendationCategories } from "../data/recommendations";
+
+// Static content, so the page is built once instead of on every request.
+export const prerender = true;
+---
+
+<Layout title="recommendations" description="things worth sharing.">
+    <PageContainer>
+        <SectionHeading as="h1">recommendations</SectionHeading>
+        <p class="intro">things worth sharing.</p>
+
+        {recommendationCategories.map((category) => (
+            <details class="category" open={category.openByDefault}>
+                <summary>
+                    <SectionHeading updated={category.lastModified}>
+                        {category.title}
+                    </SectionHeading>
+                </summary>
+
+                <ul class="recommendations">
+                    {category.items.map((item) => (
+                        <li class="recommendation">
+                            <div class="item-summary">
+                                {item.preview ? (
+                                    <Preview
+                                        href={item.url}
+                                        modal
+                                        title={item.title}
+                                        caption={item.description}
+                                        notes={item.notes}
+                                        src={item.preview}
+                      logo={item.logo}
+                                        alt={`${item.title} preview`}
+                                    >
+                                        {item.title}
+                                    </Preview>
+                                ) : (
+                                    <a
+                                        href={item.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {item.title}
+                                    </a>
+                                )}
+                                <TagList tags={item.tags} />
+                            </div>
+                            <p>{item.description}</p>
+                        </li>
+                    ))}
+                </ul>
+            </details>
+        ))}
+    </PageContainer>
+</Layout>
+
+<style>
+    .intro {
+        margin: 0 0 2.75rem;
+        color: var(--text-muted);
+    }
+
+    .category + .category {
+        margin-top: 1.75rem;
+    }
+
+    summary {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        cursor: pointer;
+        list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+        display: none;
+    }
+
+    /* disclosure marker, sized to sit on the heading's baseline grid */
+    summary::before {
+        content: "+";
+        flex-shrink: 0;
+        width: 0.7rem;
+        font-size: 0.8rem;
+        line-height: 1;
+        color: var(--text-faint);
+        transition: color 0.15s ease;
+    }
+
+    .category[open] summary::before {
+        content: "\2212";
+    }
+
+    summary :global(.section-heading) {
+        flex: 1;
+        margin: 0;
+    }
+
+    summary:hover::before,
+    summary:hover :global(.section-heading) {
+        color: var(--text-muted);
+    }
+
+    summary:focus-visible {
+        outline: 1px solid var(--text-faint);
+        outline-offset: 4px;
+    }
+
+    .recommendations {
+        list-style: none;
+        margin: 1.1rem 0 0;
+        padding: 0;
+    }
+
+    .recommendation {
+        margin-bottom: 1.1rem;
+    }
+
+    .recommendation:last-child {
+        margin-bottom: 0;
+    }
+
+    .item-summary {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    /* Every title looks the same at rest, whether or not it has a hover preview.
+       Dotted underlines stay reserved for definitions (see Tooltip.astro). */
+    .item-summary :global(a),
+    .item-summary :global(.preview-trigger) {
+        color: var(--text);
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        text-underline-offset: 3px;
+        transition:
+            color 0.15s ease,
+            text-decoration-color 0.15s ease;
+    }
+
+    .item-summary :global(a:hover),
+    .item-summary :global(.preview-trigger:hover) {
+        color: var(--link);
+        text-decoration-color: var(--link);
+    }
+
+    .recommendation p {
+        margin: 0.1rem 0 0;
+        color: var(--text-muted);
+    }
+
+    @media (max-width: 480px) {
+        .item-summary {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+    }
+</style>

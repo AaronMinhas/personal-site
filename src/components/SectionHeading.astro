@@ -1,0 +1,41 @@
+---
+interface Props {
+  as?: "h1" | "h2" | "h3";
+  updated?: string;
+}
+
+const { as: Tag = "h2", updated } = Astro.props;
+---
+
+<Tag class="section-heading">
+  <slot />
+  <span class="rule" aria-hidden="true"></span>
+  {updated && <time datetime={updated}>updated {updated}</time>}
+</Tag>
+
+<style>
+  /* small label, a hairline rule, and an optional updated date */
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 0 0 1rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    color: var(--text-faint);
+  }
+
+  .rule {
+    flex: 1;
+    min-width: 1rem;
+    height: 1px;
+    background: var(--border);
+  }
+
+  time {
+    flex-shrink: 0;
+    letter-spacing: normal;
+    white-space: nowrap;
+  }
+</style>

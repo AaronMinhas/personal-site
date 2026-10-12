@@ -1,9 +1,15 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageContainer from "../components/PageContainer.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+
+// Static content, so the page is built once instead of on every request.
+export const prerender = true;
 ---
 
-<Layout title="contact">
-  <main class="page">
+<Layout title="contact" description="How to get in touch with Aaron Minhas.">
+  <PageContainer>
+    <SectionHeading as="h1">contact</SectionHeading>
     <p>Best way to reach me is by email.</p>
 
     <p class="email">
@@ -34,16 +40,10 @@ import Layout from "../layouts/Layout.astro";
         </a>
       </li>
     </ul>
-  </main>
+  </PageContainer>
 </Layout>
 
 <style>
-  .page {
-    max-width: 52rem;
-    margin: 0 auto;
-    padding: 0 1.5rem 2rem;
-  }
-
   p {
     color: var(--text-muted);
     margin: 0 0 0.5rem;

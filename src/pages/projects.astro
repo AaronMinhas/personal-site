@@ -1,17 +1,17 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageContainer from "../components/PageContainer.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import TagList from "../components/TagList.astro";
+import { projects } from "../data/projects";
 
-const projects = [
-  {
-    title: "This Website",
-    description: "Personal site built with Astro.",
-    url: "https://github.com/AaronMinhas/personal-site",
-  },
-];
+// Static content, so the page is built once instead of on every request.
+export const prerender = true;
 ---
 
-<Layout title="projects">
-  <main class="page">
+<Layout title="projects" description="Things Aaron Minhas has built.">
+  <PageContainer>
+    <SectionHeading as="h1">projects</SectionHeading>
     <ul class="projects">
       {
         projects.map((project) => (
@@ -24,22 +24,19 @@ const projects = [
             >
               <p class="title">{project.title}</p>
               <p class="desc">{project.description}</p>
-              <span class="view">View →</span>
+              <span class="meta">
+                <TagList tags={project.tags} />
+                <span class="view">View →</span>
+              </span>
             </a>
           </li>
         ))
       }
     </ul>
-  </main>
+  </PageContainer>
 </Layout>
 
 <style>
-  .page {
-    max-width: 52rem;
-    margin: 0 auto;
-    padding: 0 1.5rem 2rem;
-  }
-
   .projects {
     list-style: none;
     margin: 0;
@@ -77,6 +74,13 @@ const projects = [
   .view {
     color: var(--text-faint);
     font-size: 0.9rem;
+  }
+
+  .meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
   }
 
   .project-entry:hover .view {

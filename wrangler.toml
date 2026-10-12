@@ -5,3 +5,6 @@ main = "./dist/_worker.js/index.js"
 
 [assets]
 directory = "./dist"
+# The Astro adapter serves static files and falls back for unknown routes
+# through this binding; without it those requests fail with a 500.
+binding = "ASSETS"

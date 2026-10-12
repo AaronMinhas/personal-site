@@ -1,0 +1,84 @@
+---
+// Modular hover-preview. Wrap any word/phrase and pass an image:
+//   <Preview src="/img.png">homelab</Preview>                     (hover only)
+//   <Preview src="/img.png" href="https://…">homelab</Preview>    (hover + link)
+//   <Preview src="/img.png" modal>homelab</Preview>               (hover + click → modal)
+//   <Preview src="/img.png" href="https://…" modal>homelab</Preview>
+//                              (hover + click → modal that links out from its image and title)
+//   <Preview modal title="…" notes={[…]}>homelab</Preview>         (no image: text-only modal)
+// All show/position/fade/modal logic lives once in Layout.astro (initPreview),
+// keyed off [data-preview] / [data-modal] — so this component stays markup-only.
+interface Props {
+  /** Image for the hover card and modal. Leave off for a text-only modal. */
+  src?: string;
+  /** Accessibility text for the image (screen readers). */
+  alt?: string;
+  /** Bold heading shown above the caption in the modal. */
+  title?: string;
+  /** Visible caption in the modal. Falls back to `alt` when omitted. */
+  caption?: string;
+  /** Longer plain-text body shown under the caption in the modal, one string per paragraph. */
+  notes?: string[];
+  /** Logo shown by itself on hover instead of `src`, with no card around it. */
+  logo?: string;
+  /** Hover card shape. Use "square" for portraits; the default is landscape. */
+  shape?: "square";
+  /** Make the word a link. External URLs open in a new tab. */
+  href?: string;
+  /** Open the image in a modal on click. With `href`, the modal carries the link. */
+  modal?: boolean;
+}
+const {
+  src,
+  alt = "",
+  title,
+  caption,
+  notes,
+  logo,
+  shape,
+  href,
+  modal = false,
+} = Astro.props;
+const notesData = notes?.length ? JSON.stringify(notes) : undefined;
+
+const isLink = !!href;
+const clickable = isLink || modal;
+const external = isLink ? /^https?:\/\//.test(href!) : false;
+---
+
+{
+  isLink ? (
+    <a
+      class:list={["preview-trigger", { clickable }]}
+      href={href}
+      data-preview={src}
+      data-preview-alt={alt}
+      data-preview-shape={shape}
+      data-preview-logo={logo}
+      data-preview-title={title}
+      data-preview-caption={caption}
+      data-preview-notes={notesData}
+      data-modal={modal ? "" : undefined}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+    >
+      <slot />
+    </a>
+  ) : (
+    <span
+      class:list={["preview-trigger", { clickable }]}
+      data-preview={src}
+      data-preview-alt={alt}
+      data-preview-shape={shape}
+      data-preview-logo={logo}
+      data-preview-title={title}
+      data-preview-caption={caption}
+      data-preview-notes={notesData}
+      data-modal={modal ? "" : undefined}
+      role={modal ? "button" : undefined}
+      tabindex={modal ? 0 : undefined}
+    >
+      <slot />
+    </span>
+  )
+}

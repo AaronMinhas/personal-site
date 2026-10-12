@@ -1,146 +1,266 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageContainer from "../components/PageContainer.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import Preview from "../components/Preview.astro";
 import { getCollection } from "astro:content";
+import { months } from "../data/months";
+
+// Static content, so the page is built once instead of on every request.
+export const prerender = true;
 
 const posts = (await getCollection("posts", ({ data }) => !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 5);
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+    .slice(0, 5);
 
 const formatDate = (date: Date) =>
-  new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-  }).format(date);
+    new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+    }).format(date);
+
+const upTo = [
+    {
+        label: "studying",
+        value: "Software Engineering at Macquarie University",
+    },
+    {
+        label: "working on",
+        value: "my undergraduate thesis on LLM reasoning",
+    },
+    {
+        label: "learning",
+        value: "Infrastructure-as-Code & Cloud infrastructure",
+    },
+    {
+        label: "building",
+        value: "software, homelab services & whatever interests me",
+    },
+];
+
+// bump this when the list above changes
+const upToUpdated = "2026-10-12";
+
+// Monthly summaries, newest first. The section hides itself while empty.
+const recentMonths = [...months]
+    .sort((a, b) => b.month.localeCompare(a.month))
+    .slice(0, 4);
+
+// "2026-09" -> "09/26" for the list, "September 2026" for the modal title
+const shortMonth = (month: string) => {
+    const [year, mm] = month.split("-");
+    return `${mm}/${year.slice(2)}`;
+};
+const longMonth = (month: string) =>
+    new Intl.DateTimeFormat("en-GB", {
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+    }).format(new Date(`${month}-01T00:00:00Z`));
 ---
 
-<Layout title="aaronminhas">
-  <main>
-    <h2>about me</h2>
-    <ul>
-      <li>final-year software engineering student</li>
-      <li>focused on learning devops</li>
-      <li>self-hoster / homelab enjoyer</li>
-    </ul>
+<Layout title="Aaron Minhas" description="Aaron's digital diary.">
+    <PageContainer>
+        <section class="block">
+            <SectionHeading as="h1">about me</SectionHeading>
+            <p class="lede">
+                I’m Aaron, a final-year software engineering student who likes
+                understanding how things work.
+            </p>
+            <p>
+                I enjoy building things, taking them apart, and fixing them.
+                Sometimes that’s software or self-hosting. Other times it’s
+                cars, electronics, or whatever else catches my interest.
+            </p>
+            <p>
+                This site is where I document projects, share what I’ve learnt,
+                and keep track of things I find interesting.
+            </p>
+        </section>
 
-    <p>
-      This site serves as my public notebook, where I share some of my thoughts,
-      learnings, and any cool projects I work on.
-    </p>
-    <p>
-      If you’re new here, start with the latest posts below, browse <a
-        href="/projects">projects</a
-      >, or
-      <a href="/contact">reach out</a>.
-    </p>
+        <section class="block">
+            <SectionHeading updated={upToUpdated}>what i’m up to</SectionHeading
+            >
+            <dl class="facts">
+                {
+                    upTo.map((item) => (
+                        <>
+                            <dt>{item.label}</dt>
+                            <dd>{item.value}</dd>
+                        </>
+                    ))
+                }
+            </dl>
+        </section>
 
-    <h2>writing</h2>
-    {
-      posts.length > 0 ? (
-        <ul class="writing">
-          {posts.map((post) => (
-            <li>
-              <a href={`/blog/${post.slug}`} class="post-entry">
-                <span class="date">{formatDate(post.data.date)}</span>
-                <span class="title">{post.data.title}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p class="empty">nothing here yet.</p>
-      )
-    }
-  </main>
+        {
+            recentMonths.length > 0 && (
+                <section class="block">
+                    <SectionHeading>month in review</SectionHeading>
+                    <ul class="entries months">
+                        {recentMonths.map((item) => (
+                            <li>
+                                {item.notes?.length || item.photo ? (
+                                    <Preview
+                                        modal
+                                        src={item.photo}
+                                        alt={item.photoAlt}
+                                        title={longMonth(item.month)}
+                                        caption={item.summary}
+                                        notes={item.notes}
+                                    >
+                                        <span class="date">
+                                            {shortMonth(item.month)}
+                                        </span>
+                                        <span class="title">
+                                            {item.summary}
+                                        </span>
+                                    </Preview>
+                                ) : (
+                                    <span class="entry">
+                                        <span class="date">
+                                            {shortMonth(item.month)}
+                                        </span>
+                                        <span class="title">
+                                            {item.summary}
+                                        </span>
+                                    </span>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )
+        }
+
+        {
+            posts.length > 0 && (
+                <section class="block">
+                    <SectionHeading>writing</SectionHeading>
+                    <ul class="entries">
+                        {posts.map((post) => (
+                            <li>
+                                <a
+                                    href={`/blog/${post.slug}`}
+                                    class="entry"
+                                >
+                                    <span class="date">
+                                        {formatDate(post.data.date)}
+                                    </span>
+                                    <span class="title">{post.data.title}</span>
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )
+        }
+    </PageContainer>
 </Layout>
 
 <style>
-  main {
-    max-width: 52rem;
-    margin: 0 auto;
-    padding: 0 1.5rem 2rem;
-  }
+    .block {
+        margin-top: 2.75rem;
+    }
 
-  h2 {
-    font-weight: bold;
-    margin: 1.2em 0 0.3em;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
+    .block:first-child {
+        margin-top: 0;
+    }
 
-  h2:first-child {
-    margin-top: 0;
-  }
+    p {
+        margin: 0 0 0.75rem;
+        color: var(--text-muted);
+    }
 
-  ul {
-    list-style: square;
-    margin: 0 0 0.5em;
-    padding-left: 1.1em;
-  }
+    p:last-child {
+        margin-bottom: 0;
+    }
 
-  li {
-    margin: 0;
-    padding-left: 0.3em;
-  }
+    /* opening line: same size as the body copy, set apart by colour alone */
+    .lede {
+        color: var(--text);
+    }
 
-  p {
-    margin: 0.5em 0;
-  }
+    .facts {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        column-gap: 2.5rem;
+        row-gap: 0.45rem;
+        margin: 0;
+    }
 
-  a {
-    color: var(--text);
-    text-decoration: underline;
-  }
+    .facts dt {
+        color: var(--text-faint);
+    }
 
-  a:hover {
-    color: var(--link);
-  }
+    .facts dd {
+        margin: 0;
+        color: var(--text-muted);
+    }
 
-  .writing {
-    list-style: none;
-    padding-left: 0;
-  }
+    /* dated rows, shared by the monthly list and the writing list */
+    .entries {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
 
-  .writing li {
-    padding: 0;
-  }
+    .entry,
+    .months :global(.preview-trigger) {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        padding: 0.4rem 0.6rem;
+        margin: 0 -0.6rem;
+        border-radius: 4px;
+        color: inherit;
+        text-decoration: none;
+        transition: background 0.15s ease;
+    }
 
-  .post-entry {
-    display: flex;
-    align-items: baseline;
-    padding: 0.35rem 0.5rem;
-    margin: 0 -0.5rem;
-    border-radius: 4px;
-    text-decoration: none;
-    transition: background 0.15s ease;
-  }
+    a.entry:hover,
+    .months :global(.preview-trigger:hover) {
+        background: rgba(128, 128, 128, 0.08);
+    }
 
-  .post-entry:hover {
-    background: rgba(128, 128, 128, 0.08);
-  }
+    .entries .date {
+        flex-shrink: 0;
+        width: 5rem;
+        font-size: 0.9rem;
+        color: var(--text-faint);
+    }
 
-  .post-entry .date {
-    color: var(--text-faint);
-    font-size: 0.9rem;
-    flex-shrink: 0;
-    width: 5.5rem;
-    margin-right: 0.5rem;
-  }
+    .entries .title {
+        color: var(--text);
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        text-underline-offset: 3px;
+        transition: text-decoration-color 0.15s ease;
+    }
 
-  .post-entry .title {
-    color: var(--text);
-    text-decoration: underline;
-    text-decoration-color: transparent;
-    text-underline-offset: 2px;
-    transition: text-decoration-color 0.15s ease;
-  }
+    a.entry:hover .title,
+    .months :global(.preview-trigger:hover) .title {
+        text-decoration-color: var(--text-faint);
+    }
 
-  .post-entry:hover .title {
-    text-decoration-color: var(--text-faint);
-  }
+    @media (max-width: 560px) {
+        .block {
+            margin-top: 2.25rem;
+        }
 
-  .empty {
-    color: var(--text-muted);
-    margin: 0;
-  }
+        .facts {
+            grid-template-columns: 1fr;
+            row-gap: 0.1rem;
+        }
+
+        .facts dd {
+            margin-bottom: 0.6rem;
+            padding-left: 1.6rem;
+        }
+
+        .facts dd:last-child {
+            margin-bottom: 0;
+        }
+    }
 </style>

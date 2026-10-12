@@ -1,12 +1,42 @@
 ---
 interface Props {
+	/** Page name; the site name is appended for every page but the homepage. */
 	title: string;
 	description?: string;
 }
 const { title, description } = Astro.props;
-import "../styles/global.css";
 
-const pathname = Astro.url.pathname;
+const siteName = "Aaron Minhas";
+const pageTitle = title === siteName ? siteName : `${title} · ${siteName}`;
+const pageDescription =
+	description ?? "The personal website of Aaron Minhas.";
+import "../styles/global.css";
+import { getCollection } from "astro:content";
+
+// Pre-built pages report their file path ("/projects.html"), so normalise to
+// the address visitors use ("/projects").
+const pathname =
+	Astro.url.pathname.replace(/\.html$/, "").replace(/(.)\/$/, "$1") || "/";
+const canonicalUrl =
+	Astro.site && pathname !== "/404"
+		? new URL(pathname, Astro.site).href
+		: undefined;
+// The portrait hover on the name only appears on the homepage.
+const isHome = pathname === "/";
+
+// Injected at build time by astro.config.mjs.
+declare const __BUILD_COMMIT__: string;
+const repoUrl = "https://github.com/AaronMinhas/personal-site";
+// Always the current GitHub profile picture, so it never needs updating here.
+const portraitUrl = "https://github.com/AaronMinhas.png?size=400";
+const firstYear = 2025;
+const currentYear = new Date().getFullYear();
+const years =
+	currentYear > firstYear ? `${firstYear}–${currentYear}` : `${firstYear}`;
+
+// The writing link only appears once there is a published post.
+const hasPosts =
+	(await getCollection("posts", ({ data }) => !data.draft)).length > 0;
 ---
 
 <!doctype html>
@@ -14,82 +44,506 @@ const pathname = Astro.url.pathname;
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
-		{description && <meta name="description" content={description} />}
+		<meta name="description" content={pageDescription} />
+		{canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content={siteName} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={pageDescription} />
+		{canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+		<meta name="twitter:card" content="summary" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<title>{title}</title>
+		<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link
+			rel="preload"
+			href="/fonts/jetbrains-mono/JetBrainsMono-Medium.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+		<link
+			rel="preload"
+			href="/fonts/libron/Libron-Regular.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+		<title>{pageTitle}</title>
 		<script is:inline>
-			const theme =
-				localStorage.getItem("theme") ||
-				(window.matchMedia("(prefers-color-scheme: dark)").matches
-					? "dark"
-					: "light");
-			document.documentElement.setAttribute("data-theme", theme);
+			(function () {
+				let theme = null;
+				try {
+					theme = localStorage.getItem("theme");
+				} catch (e) {
+					/* storage blocked: fall back to the system setting */
+				}
+				if (!theme) {
+					theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+						? "dark"
+						: "light";
+				}
+				document.documentElement.setAttribute("data-theme", theme);
+			})();
 		</script>
 	</head>
 	<body>
 		<header class="navbar">
-			<a href="/" class="name"
-				>Aaron <span class="role">(developer, designer)</span></a
+			<a
+				href="/"
+				class="name"
+				data-preview={isHome ? portraitUrl : undefined}
+				data-preview-alt={isHome ? "Aaron Minhas" : undefined}
+				data-preview-shape={isHome ? "square" : undefined}>Aaron</a
 			>
 			<nav>
-				<a href="/blog" class:list={[{ active: pathname.startsWith("/blog") }]}
-					>writing</a
+				{
+					hasPosts && (
+						<a
+							href="/blog"
+							class:list={[{ active: pathname.startsWith("/blog") }]}
+						>
+							writing
+						</a>
+					)
+				}
+				<a
+					href="/recommendations"
+					class:list={[
+						{ active: pathname.startsWith("/recommendations") },
+					]}>recommendations</a
 				>
 				<a
 					href="/projects"
 					class:list={[
-						{ active: pathname === "/projects" || pathname === "/projects/" },
+						{ active: pathname === "/projects" },
 					]}>projects</a
 				>
 				<a
 					href="/contact"
 					class:list={[
-						{ active: pathname === "/contact" || pathname === "/contact/" },
+						{ active: pathname === "/contact" },
 					]}>contact</a
 				>
 				<button id="theme-toggle" class="toggle">invert</button>
 			</nav>
 		</header>
 		<slot />
-		<script>
+		<footer class="site-footer">
+			<div class="footer-row">
+				<span>© {years} Aaron Minhas</span>
+				<div class="footer-links">
+					{
+						__BUILD_COMMIT__ && (
+							<span>
+								built from{" "}
+								<a
+									href={`${repoUrl}/commit/${__BUILD_COMMIT__}`}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{__BUILD_COMMIT__.slice(0, 7)}
+								</a>
+							</span>
+						)
+					}
+					<a href={repoUrl} target="_blank" rel="noopener noreferrer">
+						source
+					</a>
+				</div>
+			</div>
+		</footer>
+		<script is:inline>
+			// Theme toggle: curtain-slide swap via the View Transitions API.
 			const toggle = document.getElementById("theme-toggle");
+			const root = document.documentElement;
+
+			function applyTheme(next) {
+				root.setAttribute("data-theme", next);
+				try {
+					localStorage.setItem("theme", next);
+				} catch (e) {}
+			}
+
 			toggle?.addEventListener("click", () => {
-				const current = document.documentElement.getAttribute("data-theme");
+				const current = root.getAttribute("data-theme");
 				const next = current === "dark" ? "light" : "dark";
-				document.documentElement.setAttribute("data-theme", next);
-				localStorage.setItem("theme", next);
+				const reduce = window.matchMedia(
+					"(prefers-reduced-motion: reduce)",
+				).matches;
+
+				if (!document.startViewTransition || reduce) {
+					applyTheme(next);
+					return;
+				}
+				document.startViewTransition(() => applyTheme(next));
 			});
+
+			// Modular hover preview. Any element with a [data-preview] attribute
+			// shows a floating image card near the cursor. See Preview.astro.
+			(function initPreview() {
+				const card = document.createElement("div");
+				card.className = "preview-card";
+				const img = document.createElement("img");
+				card.appendChild(img);
+				document.body.appendChild(card);
+
+				const previewSelector = "[data-preview], [data-preview-logo]";
+				let current = null;
+				let hideTimer = null;
+
+				function position(e) {
+					const pad = 16;
+					const cw = card.offsetWidth || 320;
+					const ch = card.offsetHeight || 213;
+					let x = e.clientX + pad;
+					let y = e.clientY + pad;
+					if (x + cw + pad > innerWidth) x = e.clientX - cw - pad;
+					if (y + ch + pad > innerHeight) y = e.clientY - ch - pad;
+					// Logos sit beside the cursor, level with it, a little further out.
+					if (card.classList.contains("logo")) {
+						const gap = 40;
+						x = e.clientX + gap;
+						if (x + cw + pad > innerWidth) x = e.clientX - cw - gap;
+						y = e.clientY - ch / 2;
+						if (y + ch + pad > innerHeight) y = innerHeight - ch - pad;
+					}
+					if (x < pad) x = pad;
+					if (y < pad) y = pad;
+					card.style.left = x + "px";
+					card.style.top = y + "px";
+				}
+
+				function show(el, e) {
+					// A logo, when given, replaces the image on hover and floats
+					// with no card around it; the modal still shows the image.
+					const logo = el.getAttribute("data-preview-logo");
+					const src = logo || el.getAttribute("data-preview");
+					if (!src) return;
+					clearTimeout(hideTimer);
+					current = el;
+					card.classList.toggle("logo", !!logo);
+					card.classList.toggle(
+						"square",
+						el.getAttribute("data-preview-shape") === "square",
+					);
+					if (img.getAttribute("src") !== src) {
+						card.classList.remove("dark-image", "light-image");
+						img.src = src;
+						img.alt = el.getAttribute("data-preview-alt") || "";
+					}
+					position(e);
+					card.classList.remove("fading");
+					card.classList.add("visible");
+				}
+
+				function hide() {
+					current = null;
+					card.classList.remove("visible");
+					card.classList.add("fading");
+					hideTimer = setTimeout(
+						() => card.classList.remove("fading"),
+						200,
+					);
+				}
+
+				document.addEventListener("mouseover", (e) => {
+					const el = e.target.closest && e.target.closest(previewSelector);
+					if (el) show(el, e);
+				});
+				document.addEventListener("mouseout", (e) => {
+					const el = e.target.closest && e.target.closest(previewSelector);
+					if (el && !el.contains(e.relatedTarget)) hide();
+				});
+				document.addEventListener("mousemove", (e) => {
+					if (current) position(e);
+				});
+
+				// Adaptive border: white frame for dark images, black for light.
+				// Cross-origin images taint the canvas, so the read is defensive.
+				img.addEventListener("load", () => {
+					// Logos have no border to adapt.
+					if (card.classList.contains("logo")) return;
+					try {
+						const c = document.createElement("canvas");
+						c.width = 16;
+						c.height = 16;
+						const ctx = c.getContext("2d");
+						ctx.drawImage(img, 0, 0, 16, 16);
+						const d = ctx.getImageData(0, 0, 16, 16).data;
+						let sum = 0,
+							n = 0;
+						for (let i = 0; i < d.length; i += 4) {
+							sum += d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
+							n++;
+						}
+						const avg = sum / n;
+						card.classList.toggle("dark-image", avg < 128);
+						card.classList.toggle("light-image", avg >= 128);
+					} catch (e) {
+						/* tainted canvas — keep default border */
+					}
+				});
+
+				// Modal for <Preview modal> triggers ([data-modal]). When the trigger
+				// is a link, the modal's image and title link out to it instead.
+				const modal = document.createElement("div");
+				modal.className = "preview-modal";
+				modal.setAttribute("role", "dialog");
+				modal.setAttribute("aria-modal", "true");
+				modal.innerHTML =
+					'<button class="preview-modal-close" aria-label="Close">\u00d7</button>' +
+					'<figure><a class="preview-modal-image" tabindex="-1"><img alt="" /></a>' +
+					'<figcaption><a class="preview-modal-title"></a>' +
+					'<span class="preview-modal-caption"></span>' +
+					'<div class="preview-modal-notes"></div></figcaption></figure>';
+				document.body.appendChild(modal);
+				const modalImg = modal.querySelector("img");
+				const modalCap = modal.querySelector("figcaption");
+				const modalTitle = modal.querySelector(".preview-modal-title");
+				const modalCapText = modal.querySelector(".preview-modal-caption");
+				const modalNotes = modal.querySelector(".preview-modal-notes");
+				const modalLinks = modal.querySelectorAll("figure a");
+				const modalClose = modal.querySelector(".preview-modal-close");
+				// Where keyboard focus was before the modal opened.
+				let returnFocus = null;
+
+				function openModal(src, alt, title, caption, href, notes) {
+					// No image means a text-only modal (see .preview-modal.text-only).
+					modal.classList.toggle("text-only", !src);
+					if (src) {
+						modalImg.src = src;
+						modalImg.alt = alt || "";
+					} else {
+						modalImg.removeAttribute("src");
+					}
+
+					// Without an href the anchors are inert, so they read as plain content.
+					modalLinks.forEach((link) => {
+						if (href) {
+							link.href = href;
+							link.target = "_blank";
+							link.rel = "noopener noreferrer";
+						} else {
+							link.removeAttribute("href");
+						}
+					});
+
+					if (title) {
+						modalTitle.textContent = title;
+						modalTitle.style.display = "";
+					} else {
+						modalTitle.style.display = "none";
+					}
+
+					// Visible caption falls back to alt text when not provided.
+					const capText = caption || alt;
+					if (capText) {
+						modalCapText.textContent = capText;
+						modalCapText.style.display = "";
+					} else {
+						modalCapText.style.display = "none";
+					}
+
+					// Notes arrive as a JSON array of paragraphs (see Preview.astro).
+					const paragraphs = notes ? JSON.parse(notes) : [];
+					modalNotes.replaceChildren(
+						...paragraphs.map((text) => {
+							const p = document.createElement("p");
+							p.textContent = text;
+							return p;
+						}),
+					);
+					modalNotes.style.display = paragraphs.length ? "" : "none";
+
+					modalCap.style.display =
+						title || capText || paragraphs.length ? "" : "none";
+					modal.querySelector("figure").scrollTop = 0;
+					modal.setAttribute("aria-label", title || capText || "Preview");
+					returnFocus = document.activeElement;
+					modal.classList.add("open");
+					// Keep the page behind from scrolling, and move focus inside.
+					root.style.overflow = "hidden";
+					modalClose.focus();
+					hide();
+				}
+
+				function closeModal() {
+					if (!modal.classList.contains("open")) return;
+					modal.classList.remove("open");
+					root.style.overflow = "";
+					if (returnFocus && returnFocus.focus) returnFocus.focus();
+					returnFocus = null;
+				}
+
+				document.addEventListener("click", (e) => {
+					const t = e.target.closest && e.target.closest("[data-modal]");
+					if (!t) return;
+					// Leave modified clicks alone so a link trigger can still open in a new tab.
+					if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+					e.preventDefault();
+					openModal(
+						t.getAttribute("data-preview"),
+						t.getAttribute("data-preview-alt"),
+						t.getAttribute("data-preview-title"),
+						t.getAttribute("data-preview-caption"),
+						t.getAttribute("href"),
+						t.getAttribute("data-preview-notes"),
+					);
+				});
+				// Non-link triggers are role="button", so give them button keys.
+				document.addEventListener("keydown", (e) => {
+					if (e.key !== "Enter" && e.key !== " ") return;
+					const t = e.target;
+					if (t.matches && t.matches('[data-modal][role="button"]')) {
+						e.preventDefault();
+						t.click();
+					}
+				});
+				modal.addEventListener("click", (e) => {
+					if (e.target === modal || e.target.closest(".preview-modal-close")) {
+						closeModal();
+					}
+				});
+				window.addEventListener("keydown", (e) => {
+					if (!modal.classList.contains("open")) return;
+					if (e.key === "Escape") closeModal();
+					// Keep Tab cycling through the modal's own controls.
+					if (e.key === "Tab") {
+						const stops = [modalClose, modalTitle].filter(
+							(el) => el === modalClose || el.hasAttribute("href"),
+						);
+						const index = stops.indexOf(document.activeElement);
+						const step = e.shiftKey ? -1 : 1;
+						e.preventDefault();
+						stops[(index + step + stops.length) % stops.length].focus();
+					}
+				});
+			})();
 		</script>
 	</body>
 </html>
 
 <style is:global>
 	:root {
-		--bg: #fff;
-		--text: #1a1a1a;
-		--text-muted: #666;
-		--text-faint: #999;
-		--border: #e5e5e5;
+		--bg: #fcfcfb;
+		--text: #17181a;
+		--text-muted: #5b5d61;
+		--text-faint: #717478;
+		--border: #e4e4e2;
 		--link: #0645ad;
 	}
 
 	[data-theme="dark"] {
-		--bg: #0a0a0a;
-		--text: #fff;
-		--text-muted: #737373;
-		--text-faint: #525252;
-		--border: #262626;
-		--link: #6b9eff;
+		--bg: #0f0f0f;
+		--text: #e8e8e8;
+		--text-muted: #9c9c9c;
+		--text-faint: #7d7d7d;
+		--border: #252525;
+		--link: #7aa2f7;
+	}
+
+	/* JetBrains Mono (SIL OFL, see public/fonts/jetbrains-mono/OFL.txt): the
+	   site's monospace, self-hosted so it looks the same on every device */
+	@font-face {
+		font-family: "JetBrains Mono";
+		src: url("/fonts/jetbrains-mono/JetBrainsMono-Regular.woff2") format("woff2");
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+	}
+	@font-face {
+		font-family: "JetBrains Mono";
+		src: url("/fonts/jetbrains-mono/JetBrainsMono-Medium.woff2") format("woff2");
+		font-weight: 500;
+		font-style: normal;
+		font-display: swap;
+	}
+	@font-face {
+		font-family: "JetBrains Mono";
+		src: url("/fonts/jetbrains-mono/JetBrainsMono-SemiBold.woff2") format("woff2");
+		font-weight: 600;
+		font-style: normal;
+		font-display: swap;
+	}
+	@font-face {
+		font-family: "JetBrains Mono";
+		src: url("/fonts/jetbrains-mono/JetBrainsMono-Bold.woff2") format("woff2");
+		font-weight: 700;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	/* Libron (SIL OFL, see public/fonts/libron/OFL.txt): the prose font */
+	@font-face {
+		font-family: "Libron";
+		src: url("/fonts/libron/Libron-Regular.woff2") format("woff2");
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+	}
+	@font-face {
+		font-family: "Libron";
+		src: url("/fonts/libron/Libron-Italic.woff2") format("woff2");
+		font-weight: 400;
+		font-style: italic;
+		font-display: swap;
+	}
+	@font-face {
+		font-family: "Libron";
+		src: url("/fonts/libron/Libron-Bold.woff2") format("woff2");
+		font-weight: 700;
+		font-style: normal;
+		font-display: swap;
+	}
+	@font-face {
+		font-family: "Libron";
+		src: url("/fonts/libron/Libron-BoldItalic.woff2") format("woff2");
+		font-weight: 700;
+		font-style: italic;
+		font-display: swap;
 	}
 
 	html {
-		font-family:
-			ui-monospace, "SF Mono", "Cascadia Code", "Consolas", monospace;
+		--font-mono:
+			"JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", "Consolas",
+			monospace;
+		--font-prose: "Libron", Georgia, serif;
+		/* width of the content column shared by the navbar, pages and footer */
+		--page-width: 56rem;
+		font-family: var(--font-mono);
 		font-size: 14px;
+		font-weight: 500;
 		line-height: 1.6;
 	}
 
+	/* Running text is set in Libron; the menu, headings, labels, lists and
+	   dates stay monospace. Covers page paragraphs, blog post bodies and
+	   the text inside preview modals. */
+	main p:not(.title, .email),
+	main article .content,
+	.preview-modal-caption,
+	.preview-modal-notes {
+		font-family: var(--font-prose);
+		font-size: 1.2rem;
+		font-weight: 400;
+		/* avoid a lone word on a paragraph's last line */
+		text-wrap: pretty;
+	}
+
+	main article .content :is(h1, h2, h3, h4, pre, code, kbd) {
+		font-family: var(--font-mono);
+	}
+
+	main article .content :is(pre, code, kbd) {
+		font-size: 0.85em;
+	}
+
+	/* column layout so the footer sits at the bottom of short pages */
 	body {
+		display: flex;
+		flex-direction: column;
+		min-height: 100dvh;
 		background: var(--bg);
 		color: var(--text);
 		-webkit-font-smoothing: antialiased;
@@ -100,7 +554,9 @@ const pathname = Astro.url.pathname;
 	}
 
 	.navbar {
-		max-width: 52rem;
+		box-sizing: border-box;
+		width: 100%;
+		max-width: var(--page-width);
 		margin: 0 auto;
 		padding: 2rem 1.5rem;
 		display: flex;
@@ -108,17 +564,42 @@ const pathname = Astro.url.pathname;
 		align-items: center;
 	}
 
+	/* the name: on hover a band of the link colour drifts through the
+	   letters on a loop (a gradient clipped to the text) */
 	.navbar .name {
 		font-size: 1.25rem;
 		font-weight: 600;
 		color: var(--text);
 		text-decoration: none;
+		background-image: linear-gradient(
+			90deg,
+			var(--text),
+			var(--link),
+			var(--text)
+		);
+		background-size: 200% 100%;
+		-webkit-background-clip: text;
+		background-clip: text;
+		transition: color 0.25s ease;
 	}
 
-	.navbar .role {
-		font-weight: 400;
-		font-size: 0.9rem;
-		color: var(--text-faint);
+	.navbar .name:hover,
+	.navbar .name:focus-visible {
+		color: transparent;
+		animation: name-drift 3s linear infinite;
+	}
+
+	@keyframes name-drift {
+		to {
+			background-position: 200% 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.navbar .name:hover,
+		.navbar .name:focus-visible {
+			animation: none;
+		}
 	}
 
 	.navbar nav {
@@ -157,5 +638,320 @@ const pathname = Astro.url.pathname;
 	.navbar .toggle:hover {
 		color: var(--text-muted);
 		border-color: var(--text-faint);
+	}
+
+	@media (max-width: 700px) {
+		.navbar {
+			align-items: flex-start;
+			flex-direction: column;
+			gap: 1rem;
+			padding: 1.5rem;
+		}
+
+		.navbar nav {
+			flex-wrap: wrap;
+			gap: 0.75rem 1rem;
+		}
+	}
+
+	/* theme toggle: curtain-slide via View Transitions API */
+	::view-transition-old(root) {
+		animation: curtain-slide 340ms cubic-bezier(0.61, 0.03, 0.08, 1) forwards;
+		z-index: 2;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+	}
+
+	::view-transition-new(root) {
+		animation: none;
+		z-index: 1;
+	}
+
+	@keyframes curtain-slide {
+		from {
+			transform: translateY(0);
+		}
+		to {
+			transform: translateY(100vh);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		::view-transition-old(root),
+		::view-transition-new(root) {
+			animation: none;
+		}
+	}
+
+	/* site footer: mirrors the navbar, with copyright left and links right */
+	.site-footer {
+		box-sizing: border-box;
+		width: 100%;
+		max-width: var(--page-width);
+		margin: auto auto 0;
+		padding: 3rem 1.5rem 0;
+	}
+
+	.footer-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem 1.5rem;
+		padding: 1.25rem 0 2rem;
+		border-top: 1px solid var(--border);
+		font-size: 0.85rem;
+		color: var(--text-faint);
+	}
+
+	.footer-links {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.5rem 1.5rem;
+	}
+
+	/* same underlined treatment as the nav links */
+	.site-footer a {
+		color: var(--text-muted);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	.site-footer a:hover {
+		color: var(--text);
+	}
+
+	/* hover image preview (modular: see Preview.astro / [data-preview]) */
+	.preview-trigger {
+		color: inherit;
+		text-decoration: underline dotted var(--text-faint);
+		text-underline-offset: 3px;
+		text-decoration-thickness: 1px;
+		cursor: inherit;
+	}
+
+	.preview-trigger.clickable {
+		cursor: pointer;
+	}
+
+	.preview-trigger.clickable:hover {
+		color: var(--link);
+		text-decoration-color: var(--link);
+	}
+
+	.preview-card {
+		position: fixed;
+		left: 0;
+		top: 0;
+		z-index: 1000;
+		pointer-events: none;
+		opacity: 0;
+		transform: translateY(8px);
+		transition:
+			opacity 0.15s ease,
+			transform 0.15s ease;
+		border-radius: 6px;
+		overflow: hidden;
+		border: 1px solid var(--border);
+		background: var(--bg);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+	}
+
+	.preview-card.visible {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	.preview-card.fading {
+		opacity: 0;
+		transform: translateY(0);
+	}
+
+	.preview-card.dark-image {
+		border-color: #ffffff;
+	}
+
+	.preview-card.light-image {
+		border-color: #000000;
+	}
+
+	.preview-card img {
+		display: block;
+		width: 320px;
+		height: 213px;
+		object-fit: cover;
+		background: var(--bg);
+	}
+
+	/* logo (data-preview-logo): just the icon, with no card behind it */
+	.preview-card.logo {
+		border: none;
+		border-radius: 0;
+		background: none;
+		box-shadow: none;
+		overflow: visible;
+	}
+
+	.preview-card.logo img {
+		width: 72px;
+		height: 72px;
+		object-fit: contain;
+		background: none;
+	}
+
+	/* square variant for portraits (data-preview-shape="square") */
+	.preview-card.square img {
+		width: 200px;
+		height: 200px;
+	}
+
+	@media (max-width: 480px) {
+		.preview-card img {
+			width: 220px;
+			height: 146px;
+		}
+
+		.preview-card.square img {
+			width: 160px;
+			height: 160px;
+		}
+	}
+
+	/* preview modal (for <Preview modal>) */
+	.preview-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 1100;
+		display: none;
+		align-items: center;
+		justify-content: center;
+		padding: 2rem;
+		background: rgba(0, 0, 0, 0.6);
+		opacity: 0;
+		transition: opacity 0.2s ease;
+	}
+
+	.preview-modal.open {
+		display: flex;
+		opacity: 1;
+	}
+
+	.preview-modal figure {
+		margin: 0;
+		max-width: min(900px, 92vw);
+		max-height: 100%;
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		overflow: hidden auto;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+		transform: translateY(8px) scale(0.98);
+		transition: transform 0.2s ease;
+	}
+
+	.preview-modal.open figure {
+		transform: translateY(0) scale(1);
+	}
+
+	.preview-modal img {
+		display: block;
+		width: 100%;
+		max-height: 75vh;
+		object-fit: contain;
+		background: var(--bg);
+	}
+
+	.preview-modal figcaption {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+		padding: 0.7rem 1rem;
+		font-size: 0.85rem;
+		color: var(--text-muted);
+		border-top: 1px solid var(--border);
+	}
+
+	.preview-modal-title {
+		align-self: flex-start;
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	/* text-only modal: no image, so the figure takes a reading width */
+	.preview-modal.text-only .preview-modal-image {
+		display: none;
+	}
+
+	.preview-modal.text-only figure {
+		width: min(36rem, 100%);
+	}
+
+	.preview-modal.text-only figcaption {
+		padding: 1.1rem 1.25rem 1.25rem;
+		border-top: none;
+	}
+
+	/* longer write-up under the caption; zero intrinsic width so the text
+	   wraps to the image instead of stretching the modal */
+	.preview-modal-notes {
+		width: 0;
+		min-width: 100%;
+		margin-top: 0.55rem;
+		padding-top: 0.65rem;
+		border-top: 1px solid var(--border);
+		line-height: 1.6;
+	}
+
+	.preview-modal-notes p {
+		margin: 0 0 0.6rem;
+	}
+
+	.preview-modal-notes p:last-child {
+		margin-bottom: 0;
+	}
+
+	/* linked modals: a faint arrow on the title is the only hint at rest */
+	.preview-modal-title[href]::after {
+		content: " \2197";
+		font-weight: 400;
+		color: var(--text-faint);
+		transition: color 0.15s ease;
+	}
+
+	.preview-modal-title[href]:hover,
+	.preview-modal-title[href]:hover::after {
+		color: var(--link);
+	}
+
+	.preview-modal-image {
+		display: block;
+	}
+
+	.preview-modal-image[href] img {
+		transition: opacity 0.15s ease;
+	}
+
+	.preview-modal-image[href]:hover img {
+		opacity: 0.92;
+	}
+
+	.preview-modal-close {
+		position: absolute;
+		top: 1rem;
+		right: 1.25rem;
+		background: none;
+		border: none;
+		color: #fff;
+		font-size: 1.75rem;
+		line-height: 1;
+		cursor: pointer;
+		padding: 0.2rem 0.5rem;
+		opacity: 0.8;
+	}
+
+	.preview-modal-close:hover {
+		opacity: 1;
 	}
 </style>

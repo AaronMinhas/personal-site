@@ -1,6 +1,11 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import PageContainer from "../../components/PageContainer.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
 import { getCollection } from "astro:content";
+
+// Static content, so the page is built once instead of on every request.
+export const prerender = true;
 
 const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
@@ -14,8 +19,9 @@ const formatDate = (date: Date) =>
   }).format(date);
 ---
 
-<Layout title="writing">
-  <main class="page">
+<Layout title="writing" description="Writing by Aaron Minhas.">
+  <PageContainer>
+    <SectionHeading as="h1">writing</SectionHeading>
     {
       posts.length > 0 ? (
         <ul class="posts">
@@ -29,19 +35,13 @@ const formatDate = (date: Date) =>
           ))}
         </ul>
       ) : (
-        <p class="empty">Nothing here yet.</p>
+        <p class="empty">nothing here yet.</p>
       )
     }
-  </main>
+  </PageContainer>
 </Layout>
 
 <style>
-  .page {
-    max-width: 52rem;
-    margin: 0 auto;
-    padding: 0 1.5rem 2rem;
-  }
-
   .posts {
     list-style: none;
     margin: 0;

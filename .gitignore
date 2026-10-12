@@ -16,6 +16,16 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.dev.vars
+
+# wrangler local state
+.wrangler/
+
+# unpublished posts: move into src/content/posts/ to publish
+drafts/
+
+# machine-specific Claude Code settings
+.claude/settings.local.json
 
 # macOS-specific files
 .DS_Store
