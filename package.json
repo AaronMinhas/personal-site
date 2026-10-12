@@ -7,7 +7,8 @@
     "build": "astro build && printf '_worker.js\\n.DS_Store\\n' > dist/.assetsignore",
     "preview": "astro preview",
     "astro": "astro",
-    "screenshot": "node scripts/screenshot.mjs"
+    "screenshot": "node scripts/screenshot.mjs",
+    "card": "node scripts/card.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.9",

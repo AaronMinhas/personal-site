@@ -22,7 +22,7 @@ Follow the existing Astro and TypeScript style: two-space indentation in page/co
 
 ## Hover Previews & Tooltips
 
-Use `<Preview>` for image previews attached to words or links. Pass `src` and useful `alt` text; add `href` for a link or `modal` plus optional `title`/`caption` for an enlarged view. Pass both and the click opens the modal, whose image and title link out to `href`. Pass `notes` (an array of plain-text paragraphs) for a longer write-up under the caption. Leave `src` off for a text-only modal. Its shared positioning, fading, adaptive border, and modal logic lives in `Layout.astro` and is driven by `data-preview`/`data-modal` attributes. Do not duplicate that script in pages.
+Use `<Preview>` for image previews attached to words or links. Pass `src` and useful `alt` text; add `href` for a link or `modal` plus optional `title`/`caption` for an enlarged view. Pass both and the click opens the modal, whose image and title link out to `href`. Pass `notes` (an array of plain-text paragraphs, in which `[label](https://…)` becomes a link) for a longer write-up under the caption. Leave `src` off for a text-only modal. Its shared positioning, fading, adaptive border, and modal logic lives in `Layout.astro` and is driven by `data-preview`/`data-modal` attributes. Do not duplicate that script in pages.
 
 Use `<Tooltip term="..." />` for definitions. Add or edit definitions in `src/data/terms.ts`.
 
@@ -32,7 +32,7 @@ Use `<SectionHeading>` for page titles and section labels. It renders the small 
 
 ## Recommendation Images
 
-Take recommendation screenshots with `npm run screenshot -- <url> <name>`, never by hand. It writes `public/images/software/<name>.webp` at a fixed window size, zoom, colour scheme, and output width so every modal image matches; change the constants in `scripts/screenshot.mjs` to restyle the whole set. Each recommendation's `logo` is the tool's official logo, unmodified, in `public/images/logos/`; it is shown after the title at the text's own size.
+Take recommendation screenshots with `npm run screenshot -- <url> <name>`, never by hand. It writes `public/images/software/<name>.webp` at a fixed window size, colour scheme, and output width so every modal image matches. Do not use a GitHub repository page as the image: for a tool with no page worth capturing, run `npm run card -- <name> "<title>" <icon file>` to generate a title card (the app's icon and name on a dark background) in the same size. Both share their settings in `scripts/capture.mjs`; change them there to restyle the whole set. Each recommendation's `logo` is the app's own icon, unmodified, as a 64px WebP in `public/images/logos/`; it is shown after the title at the text's own size. An optional `since` year shows as a `[used since 2022]` tag beside the title in the modal, never in the list; only set it when the user gives the year.
 
 ## Monthly Summaries
 

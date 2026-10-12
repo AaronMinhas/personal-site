@@ -34,6 +34,7 @@ export const prerender = true;
                                         title={item.title}
                                         caption={item.description}
                                         notes={item.notes}
+                                        meta={item.since ? `used since ${item.since}` : undefined}
                                         src={item.preview}
                                         alt={`${item.title} preview`}
                                     >

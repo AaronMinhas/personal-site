@@ -17,8 +17,10 @@ interface Props {
   title?: string;
   /** Visible caption in the modal. Falls back to `alt` when omitted. */
   caption?: string;
-  /** Longer plain-text body shown under the caption in the modal, one string per paragraph. */
+  /** Longer body shown under the caption in the modal, one string per paragraph. Plain text plus [label](https://…) links. */
   notes?: string[];
+  /** Short label shown as a tag beside the modal title, e.g. "used since 2023". */
+  meta?: string;
   /** Hover card shape. Use "square" for portraits; the default is landscape. */
   shape?: "square";
   /** Make the word a link. External URLs open in a new tab. */
@@ -32,6 +34,7 @@ const {
   title,
   caption,
   notes,
+  meta,
   shape,
   href,
   modal = false,
@@ -54,6 +57,7 @@ const external = isLink ? /^https?:\/\//.test(href!) : false;
       data-preview-title={title}
       data-preview-caption={caption}
       data-preview-notes={notesData}
+      data-preview-meta={meta}
       data-modal={modal ? "" : undefined}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
@@ -69,6 +73,7 @@ const external = isLink ? /^https?:\/\//.test(href!) : false;
       data-preview-title={title}
       data-preview-caption={caption}
       data-preview-notes={notesData}
+      data-preview-meta={meta}
       data-modal={modal ? "" : undefined}
       role={modal ? "button" : undefined}
       tabindex={modal ? 0 : undefined}

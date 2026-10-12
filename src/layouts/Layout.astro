@@ -270,7 +270,9 @@ const hasPosts =
 				modal.innerHTML =
 					'<button class="preview-modal-close" aria-label="Close">\u00d7</button>' +
 					'<figure><a class="preview-modal-image" tabindex="-1"><img alt="" /></a>' +
-					'<figcaption><a class="preview-modal-title"></a>' +
+					'<figcaption><div class="preview-modal-head">' +
+					'<a class="preview-modal-title"></a>' +
+					'<span class="preview-modal-meta"></span></div>' +
 					'<span class="preview-modal-caption"></span>' +
 					'<div class="preview-modal-notes"></div></figcaption></figure>';
 				document.body.appendChild(modal);
@@ -279,12 +281,13 @@ const hasPosts =
 				const modalTitle = modal.querySelector(".preview-modal-title");
 				const modalCapText = modal.querySelector(".preview-modal-caption");
 				const modalNotes = modal.querySelector(".preview-modal-notes");
+				const modalMeta = modal.querySelector(".preview-modal-meta");
 				const modalLinks = modal.querySelectorAll("figure a");
 				const modalClose = modal.querySelector(".preview-modal-close");
 				// Where keyboard focus was before the modal opened.
 				let returnFocus = null;
 
-				function openModal(src, alt, title, caption, href, notes) {
+				function openModal(src, alt, title, caption, href, notes, meta) {
 					// No image means a text-only modal (see .preview-modal.text-only).
 					modal.classList.toggle("text-only", !src);
 					if (src) {
@@ -312,6 +315,9 @@ const hasPosts =
 						modalTitle.style.display = "none";
 					}
 
+					// Optional tag beside the title, in the site's [bracket] style.
+					modalMeta.textContent = meta ? `[${meta}]` : "";
+
 					// Visible caption falls back to alt text when not provided.
 					const capText = caption || alt;
 					if (capText) {
@@ -322,11 +328,25 @@ const hasPosts =
 					}
 
 					// Notes arrive as a JSON array of paragraphs (see Preview.astro).
+					// They are plain text, except that [label](https://…) becomes a
+					// link; everything is built as text nodes, never parsed as HTML.
 					const paragraphs = notes ? JSON.parse(notes) : [];
+					const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
 					modalNotes.replaceChildren(
 						...paragraphs.map((text) => {
 							const p = document.createElement("p");
-							p.textContent = text;
+							let last = 0;
+							for (const match of text.matchAll(linkPattern)) {
+								p.append(text.slice(last, match.index));
+								const link = document.createElement("a");
+								link.textContent = match[1];
+								link.href = match[2];
+								link.target = "_blank";
+								link.rel = "noopener noreferrer";
+								p.append(link);
+								last = match.index + match[0].length;
+							}
+							p.append(text.slice(last));
 							return p;
 						}),
 					);
@@ -365,6 +385,7 @@ const hasPosts =
 						t.getAttribute("data-preview-caption"),
 						t.getAttribute("href"),
 						t.getAttribute("data-preview-notes"),
+						t.getAttribute("data-preview-meta"),
 					);
 				});
 				// Non-link triggers are role="button", so give them button keys.
@@ -386,9 +407,11 @@ const hasPosts =
 					if (e.key === "Escape") closeModal();
 					// Keep Tab cycling through the modal's own controls.
 					if (e.key === "Tab") {
-						const stops = [modalClose, modalTitle].filter(
-							(el) => el === modalClose || el.hasAttribute("href"),
-						);
+						const stops = [
+							modalClose,
+							modalTitle,
+							...modalNotes.querySelectorAll("a"),
+						].filter((el) => el === modalClose || el.hasAttribute("href"));
 						const index = stops.indexOf(document.activeElement);
 						const step = e.shiftKey ? -1 : 1;
 						e.preventDefault();
@@ -751,11 +774,12 @@ const hasPosts =
 		border-color: #000000;
 	}
 
+	/* The card takes the image's own shape, so the whole image shows with
+	   nothing cropped off the sides. */
 	.preview-card img {
 		display: block;
 		width: 320px;
-		height: 213px;
-		object-fit: cover;
+		height: auto;
 		background: var(--bg);
 	}
 
@@ -763,12 +787,12 @@ const hasPosts =
 	.preview-card.square img {
 		width: 200px;
 		height: 200px;
+		object-fit: cover;
 	}
 
 	@media (max-width: 480px) {
 		.preview-card img {
 			width: 220px;
-			height: 146px;
 		}
 
 		.preview-card.square img {
@@ -831,8 +855,21 @@ const hasPosts =
 		border-top: 1px solid var(--border);
 	}
 
+	/* title on the left, optional tag on the right */
+	.preview-modal-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.preview-modal-meta {
+		flex-shrink: 0;
+		font-size: 0.8rem;
+		color: var(--text-faint);
+	}
+
 	.preview-modal-title {
-		align-self: flex-start;
 		font-size: 0.95rem;
 		font-weight: 600;
 		color: var(--text);
@@ -870,6 +907,22 @@ const hasPosts =
 
 	.preview-modal-notes p:last-child {
 		margin-bottom: 0;
+	}
+
+	/* quiet at rest (a faint underline), link colour on hover */
+	.preview-modal-notes a {
+		color: var(--text);
+		text-decoration: underline;
+		text-decoration-color: var(--text-faint);
+		text-underline-offset: 3px;
+		transition:
+			color 0.15s ease,
+			text-decoration-color 0.15s ease;
+	}
+
+	.preview-modal-notes a:hover {
+		color: var(--link);
+		text-decoration-color: var(--link);
 	}
 
 	/* linked modals: a faint arrow on the title is the only hint at rest */
