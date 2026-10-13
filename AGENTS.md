@@ -40,7 +40,7 @@ The homepage "month in review" section is generated from `src/data/months.ts`: o
 
 ## Pages & Navigation
 
-The `/recommendations` page is generated from category/item data in `src/data/recommendations.ts`. When adding a top-level page, also update the navigation and active-route logic in `Layout.astro` and the page list in `src/pages/sitemap.xml.ts`. `Layout.astro` appends the site name to each page `title` and emits the description, canonical, and link-preview tags, so pass a bare `title` and a `description`.
+The `/recommendations` page is generated from category/item data in `src/data/recommendations.ts`. When adding a top-level page, also update the navigation and active-route logic in `Layout.astro` and the page list in `src/pages/sitemap.xml.ts`. `Layout.astro` shows each page `title` as written, on its own, as the browser tab title and emits the description, canonical, and link-preview tags, so pass a bare `title` and a `description`.
 
 ## Commits & Pull Requests
 

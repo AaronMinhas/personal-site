@@ -1,13 +1,15 @@
 ---
 interface Props {
-	/** Page name; the site name is appended for every page but the homepage. */
+	/** Page name; shown as written, on its own, as the browser tab title. */
 	title: string;
 	description?: string;
 }
 const { title, description } = Astro.props;
 
 const siteName = "Aaron Minhas";
-const pageTitle = title === siteName ? siteName : `${title} · ${siteName}`;
+// The face icon identifies the site, so the tab carries the page name alone,
+// lowercase like the headings on the pages.
+const pageTitle = title;
 const pageDescription =
 	description ?? "The personal website of Aaron Minhas.";
 import "../styles/global.css";
@@ -48,9 +50,8 @@ const hasPosts =
 		<meta property="og:description" content={pageDescription} />
 		{canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
 		<meta name="twitter:card" content="summary" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" type="image/png" sizes="48x48" href="/favicon.png" />
-		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="96x96" href="/favicon.png?v=2" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
 		<link
 			rel="preload"
 			href="/fonts/jetbrains-mono/JetBrainsMono-Medium.woff2"
